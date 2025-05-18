@@ -1,0 +1,6 @@
+path: C:/Users/Owner/Desktop/aaa
+train: images
+val: images
+
+nc: 1
+names: ['paper']

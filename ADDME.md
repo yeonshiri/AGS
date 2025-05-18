@@ -1,1 +1,1 @@
-#Auto Grading System
+Auto Grading System

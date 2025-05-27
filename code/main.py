@@ -60,7 +60,7 @@ def main():
 
     # 5. 주관식 문제 영역 YOLO 탐지 + crop 저장
     print("\n🚀 주관식 YOLO detect 시작")
-    _, _ = run_yolo_detect(
+    _, label_subj = run_yolo_detect(
         weights_path=SA_WEIGHT,
         image_dir=SUBJ_IMAGE_DIR,
         img_size=640,

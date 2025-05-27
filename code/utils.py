@@ -18,6 +18,8 @@ import cv2
 import os
 import shutil
 import json
+import glob
+
 
 def capture_exam_images(save_dir="/home/pi/yolov5/picture"):    # 저장 경로 라즈베리파이에 맞게 수정
     os.makedirs(save_dir, exist_ok=True)
@@ -87,19 +89,17 @@ def compare_dictionary(answer_dic, student_answers):
     return score  # 필요하면 외부에서 점수 활용할 수 있도록 반환
 
 
-def cleanup_directories(paths):
-    """
-    전달된 경로 목록을 삭제합니다. (디렉토리 및 그 내부 내용 포함)
-    """
-    for path in paths:
-        if os.path.exists(path):
-            try:
-                shutil.rmtree(path)
-                print(f"🗑️ 삭제 완료: {path}")
-            except Exception as e:
-                print(f"❌ 삭제 실패: {path} → {e}")
+def cleanup_directories(dirs):
+    for d in dirs:
+        if os.path.exists(d):
+            for f in os.listdir(d):
+                fp = os.path.join(d, f)
+                if os.path.isfile(fp) or os.path.islink(fp):
+                    os.remove(fp)
+                elif os.path.isdir(fp):
+                    shutil.rmtree(fp)
         else:
-            print(f"⚠️ 경로 없음 (건너뜀): {path}")
+            os.makedirs(d)
             
 def cleanup_yolo_exp(base_path="yolov5/runs/detect"):
     """

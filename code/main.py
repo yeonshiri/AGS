@@ -11,24 +11,38 @@ from grading.objective import predict_answer_objective_dict
 RAW_IMAGE_DIR = "input/raw_images"
 OBJ_IMAGE_DIR = "input/objective"
 SUBJ_IMAGE_DIR = "input/subjective"
-SUB_CROP = "yolov5/runs/detect/answerbox_detect/crops"
+SUB_CROP = "runs/detect/answerbox_detect/crops/answer_box"
 ANSWER_KEY_PATH = "data/answer_key.json"
 ROI_WEIGHT = "weights/roi.pt"   # 경로 오탈자 수정 (weight → weights)
-SA_WEIGHT =  "weithgt/sa.pt"
-MC_WEIGHT =  "weithgt/mc.pt"
+SA_WEIGHT =  "weights/sa.pt"
+MC_WEIGHT =  "weights/mc.pt"
 
 
 def main():
+    cleanup_directories([
+    OBJ_IMAGE_DIR,
+    SUBJ_IMAGE_DIR,
+    SUB_CROP,
+    "runs/detect/roi_detect",
+    "runs/detect/objective_detect",
+    "runs/detect/answerbox_detect"
+    ])
+
     # 1. 시험지 촬영
-    image_dir = capture_exam_images(RAW_IMAGE_DIR)
+    image_dir = [
+        os.path.join(RAW_IMAGE_DIR, f)
+        for f in sorted(os.listdir(RAW_IMAGE_DIR))
+        if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))
+    ]
 
     # 2. ROI 추출 및 분리
-    obj_dir, subj_dir = extract_roi_and_split(
-        image_paths=image_dir,
-        best_path=ROI_WEIGHT,
+    extract_roi_and_split(
+        input_dir=RAW_IMAGE_DIR,       
+        weights_path=ROI_WEIGHT,          
         output_mc_dir=OBJ_IMAGE_DIR,
         output_sa_dir=SUBJ_IMAGE_DIR
     )
+
 
     # 3. 정답 불러오기
     answer_key = load_answer_key(ANSWER_KEY_PATH)
@@ -39,27 +53,33 @@ def main():
         weights_path= MC_WEIGHT,
         image_dir=OBJ_IMAGE_DIR,
         img_size=640,
-        conf=0.25,
+        conf=0.5,
         save_crop=False,
         name="objective_detect"
     )
 
     # 5. 주관식 문제 영역 YOLO 탐지 + crop 저장
     print("\n🚀 주관식 YOLO detect 시작")
-    _, label_subj = run_yolo_detect(
+    _, _ = run_yolo_detect(
         weights_path=SA_WEIGHT,
         image_dir=SUBJ_IMAGE_DIR,
         img_size=640,
-        conf=0.25,
+        conf=0.5,
         save_crop=True,
         name="answerbox_detect"
     )
 
     # 6. 답안 예측
     print("\n📋 답안 예측 중...")
-    student_answers = predict_answer_objective_dict(label_dir_obj)
-    student_answers.update(extract_texts_from_cropped_answers(label_subj))
 
+    student_answers = predict_answer_objective_dict(label_dir_obj)
+    student_answers.update(extract_texts_from_cropped_answers(SUB_CROP))
+
+    result = extract_texts_from_cropped_answers(label_subj)
+    print("🧾 주관식 추출 결과:", result)
+
+    student_answers.update(result)
+    print(student_answers)
     # 7. 채점
     print("\n📝 채점 시작")
     final_score = compare_dictionary(answer_key, student_answers)
@@ -68,8 +88,14 @@ def main():
     confirm = input("채점 완료. 이미지 데이터를 삭제할까요? (y/n): ")
     if confirm.lower() == "y":
         cleanup_directories([
-            RAW_IMAGE_DIR, OBJ_IMAGE_DIR, SUBJ_IMAGE_DIR, SUB_CROP
+            OBJ_IMAGE_DIR,
+            SUBJ_IMAGE_DIR,
+            SUB_CROP,
+            "runs/detect/roi_detect",
+            "runs/detect/objective_detect",
+            "runs/detect/answerbox_detect"
         ])
+
     cleanup_yolo_exp()  # ← exp, exp1, exp2 등 삭제
     print("🧹 이미지 및 YOLO 결과 초기화 완료.")
     

@@ -1,6 +1,7 @@
 import subprocess
 import os
 import glob
+from pathlib import Path
 
 def run_yolo_detect(weights_path, image_dir, img_size=640, conf=0.25,
                     save_crop=False, project="runs/detect", name="exp"):
@@ -11,8 +12,12 @@ def run_yolo_detect(weights_path, image_dir, img_size=640, conf=0.25,
     """
     print("🚀 YOLO detect 실행 중...")
 
+    # detect.py 경로 명시적으로 지정
+    detect_py_path = str(Path("yolov5") / "detect.py")
+    cwd = Path(__file__).parent  # ags/ 폴더 기준으로 실행
+
     command = [
-        "python", "detect.py",
+        "python", detect_py_path,
         "--weights", weights_path,
         "--source", image_dir,
         "--img", str(img_size),
@@ -26,22 +31,20 @@ def run_yolo_detect(weights_path, image_dir, img_size=640, conf=0.25,
     if save_crop:
         command.append("--save-crop")
 
-    subprocess.run(command, cwd="yolov5")
+    subprocess.run(command, cwd=cwd)
 
-    output_dir = os.path.join("yolov5", project, name)
-    label_dir = os.path.join(output_dir, "labels")
-    crop_dir = os.path.join(output_dir, "crops") if save_crop else None
+    output_dir = cwd / project / name
+    label_dir = output_dir / "labels"
+    crop_dir = output_dir / "crops" if save_crop else None
 
-    if not os.path.exists(label_dir):
+    if not label_dir.exists():
         raise FileNotFoundError("YOLO detect 결과 라벨 폴더가 없습니다.")
 
     print(f"✅ detect 완료 → 라벨 경로: {label_dir}")
-    if crop_dir and os.path.exists(crop_dir):
+    if crop_dir and crop_dir.exists():
         print(f"📦 crop 경로: {crop_dir}")
 
-    return label_dir, crop_dir
-
-    
+    return str(label_dir), str(crop_dir)
 
 
 def parse_yolo_label(label_path):

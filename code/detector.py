@@ -41,6 +41,8 @@ def run_yolo_detect(weights_path, image_dir, img_size=640, conf=0.25,
 
     return label_dir, crop_dir
 
+    
+
 
 def parse_yolo_label(label_path):
     """

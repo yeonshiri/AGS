@@ -1,9 +1,6 @@
 import math
 
 def deduplicate_option_boxes(option_list, distance_threshold=0.045):
-    """
-    중복된 보기 박스를 클러스터링하여 평균 좌표 반환
-    """
     if not option_list:
         return []
 
@@ -25,13 +22,10 @@ def deduplicate_option_boxes(option_list, distance_threshold=0.045):
     ]
 
 def sort_boxes_gridwise(boxes, row_threshold=0.05):
-    """
-    보기 박스를 y축 기준 행 정렬 후, 각 행을 x축 기준 정렬
-    """
     if not boxes:
         return []
 
-    boxes.sort(key=lambda b: b[1])  # y 기준 정렬
+    boxes.sort(key=lambda b: b[1])
     rows = []
     current_row = [boxes[0]]
 
@@ -45,37 +39,43 @@ def sort_boxes_gridwise(boxes, row_threshold=0.05):
 
     sorted_boxes = []
     for row in rows:
-        sorted_boxes.extend(sorted(row, key=lambda b: b[0]))  # x 기준 정렬
+        sorted_boxes.extend(sorted(row, key=lambda b: b[0]))
 
     return sorted_boxes
 
 def get_closest_option(mark_center, option_centers):
-    """
-    마킹 위치에서 가장 가까운 보기 박스를 찾고 번호 반환 (1부터 시작)
-    """
     if not option_centers:
         return None
     dists = [math.hypot(mark_center[0] - opt[0], mark_center[1] - opt[1]) for opt in option_centers]
     return dists.index(min(dists)) + 1
 
-def predict_answer_objective(boxes):
+def predict_answer_objective_dict(label_dir):
     """
-    YOLO 라벨 기반으로 예측된 보기 번호 반환
-
-    Parameters:
-        boxes (dict): {
-            'option_box': [(x, y), ...],
-            'marked': [(x, y)]
-        }
+    디렉토리 내 모든 라벨 파일을 읽고, 객관식 선택지를 dict 형태로 저장
 
     Returns:
-        int or None: 선택된 보기 번호, 없으면 None
+        dict: { '1.jpg': 3, '2.jpg': 2, ... }
     """
-    option_boxes = deduplicate_option_boxes(boxes.get('option_box', []))
-    marked_boxes = boxes.get('marked', [])
+    import os
+    import glob
+    from detector import parse_yolo_label  # YOLO 라벨 파싱 함수 필요
 
-    if not option_boxes or not marked_boxes:
-        return None
+    answer_dict = {}
+    label_files = sorted(glob.glob(os.path.join(label_dir, "*.txt")))
 
-    sorted_options = sort_boxes_gridwise(option_boxes)
-    return get_closest_option(marked_boxes[0], sorted_options)
+    for label_path in label_files:
+        filename = os.path.splitext(os.path.basename(label_path))[0] + ".jpg"
+        boxes = parse_yolo_label(label_path)
+
+        option_boxes = deduplicate_option_boxes(boxes.get('option_box', []))
+        marked_boxes = boxes.get('marked', [])
+
+        if not option_boxes or not marked_boxes:
+            answer_dict[filename] = None
+            continue
+
+        sorted_options = sort_boxes_gridwise(option_boxes)
+        selected = get_closest_option(marked_boxes[0], sorted_options)
+        answer_dict[filename] = selected
+
+    return answer_dict

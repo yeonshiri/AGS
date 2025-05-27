@@ -1,55 +1,77 @@
 import os
 from pathlib import Path
-from detector import load_model, detect_question_boxes, detect_choices
-from ocr import extract_text_with_ocr
-from grader import AutoGrader
-from utils import (
-    capture_exam_images,
-    extract_roi_and_split,
-    load_answer_key,
-    cleanup_directories,
-)
+
+from roi import extract_roi_and_split
+from detector import run_yolo_detect
+from utils import capture_exam_images, compare_dictionary, load_answer_key, cleanup_directories, cleanup_yolo_exp
+from grading.subjective import extract_texts_from_cropped_answers
+from grading.objective import predict_answer_objective_dict
 
 # 설정 경로
-RAW_IMAGE_DIR = "input/raw_images"    #사진을 찍었을 때 저장이 되는 경로
-OBJ_IMAGE_DIR = "input/objective"     #객관식 사진 저장 경로
-SUBJ_IMAGE_DIR = "input/subjective"   #단답형 사진 저장 경로
-ANSWER_KEY_PATH = "data/answer_key.json"   #답안지 저장장소 
-WEIGHTS_PATH_QUESTION = "weights/question_box.pt"  #문제 추출 best.pt 
-WEIGHTS_PATH_ANSWER_BOX = "weights/answer_box.pt"  #객관식 best.pt
-WEIGHTS_PATH_CHOICE = "weights/option_box.pt"      #단답형 best.pt
+RAW_IMAGE_DIR = "input/raw_images"
+OBJ_IMAGE_DIR = "input/objective"
+SUBJ_IMAGE_DIR = "input/subjective"
+SUB_CROP = "yolov5/runs/detect/answerbox_detect/crops"
+ANSWER_KEY_PATH = "data/answer_key.json"
+ROI_WEIGHT = "weights/roi.pt"   # 경로 오탈자 수정 (weight → weights)
+SA_WEIGHT =  "weithgt/sa.pt"
+MC_WEIGHT =  "weithgt/mc.pt"
+
 
 def main():
-    # 1. 시험지 촬영 및 저장
-    capture_exam_images(output_dir=RAW_IMAGE_DIR)  # n장의 이미지 촬영하여 저장
+    # 1. 시험지 촬영
+    image_dir = capture_exam_images()
 
-    # 2. ROI 추출하여 객관식/단답형 구분 및 저장
-    extract_roi_and_split(RAW_IMAGE_DIR, OBJ_IMAGE_DIR, SUBJ_IMAGE_DIR)
+    # 2. ROI 추출 및 분리
+    obj_dir, subj_dir = extract_roi_and_split(
+        image_paths=image_dir,
+        best_path=ROI_WEIGHT,
+        output_mc_dir=OBJ_IMAGE_DIR,
+        output_sa_dir=SUBJ_IMAGE_DIR
+    )
 
-    # 3. 모델 및 정답 불러오기
-    model_question = load_model(WEIGHTS_PATH_QUESTION)        # 문제 영역 추출용
-    model_choice = load_model(WEIGHTS_PATH_CHOICE)            # 객관식 선지 감지용
-    model_answer = load_model(WEIGHTS_PATH_ANSWER_BOX)        # 단답형 답안 박스 감지용
+    # 3. 정답 불러오기
     answer_key = load_answer_key(ANSWER_KEY_PATH)
 
-    # 4. 채점기 생성
-    grader = AutoGrader(
-    model_question=model_question,
-    model_choice=model_choice,
-    model_answer=model_answer,
-    answer_key=answer_key
-)
+    # 4. 객관식 문제 영역 YOLO 탐지
+    print("\n🚀 객관식 YOLO detect 시작")
+    label_dir_obj, _ = run_yolo_detect(
+        weights_path= MC_WEIGHT,
+        image_dir=OBJ_IMAGE_DIR,
+        img_size=640,
+        conf=0.25,
+        save_crop=False,
+        name="objective_detect"
+    )
 
-    # 5. 채점 실행
-    final_score = grader.run(objective_dir=OBJ_IMAGE_DIR, subjective_dir=SUBJ_IMAGE_DIR)
+    # 5. 주관식 문제 영역 YOLO 탐지 + crop 저장
+    print("\n🚀 주관식 YOLO detect 시작")
+    _, label_subj = run_yolo_detect(
+        weights_path=SA_WEIGHT,
+        image_dir=SUBJ_IMAGE_DIR,
+        img_size=640,
+        conf=0.25,
+        save_crop=True,
+        name="answerbox_detect"
+    )
 
-    print(f"[RESULT] Final Score: {final_score}")
+    # 6. 답안 예측
+    print("\n📋 답안 예측 중...")
+    student_answers = predict_answer_objective_dict(label_dir_obj)
+    student_answers.update(extract_texts_from_cropped_answers(label_subj))
 
-    # 6. 사용자 확인 시 초기화
+    # 7. 채점
+    print("\n📝 채점 시작")
+    final_score = compare_dictionary(answer_key, student_answers)
+
+    # 8. 이미지 정리 여부 확인
     confirm = input("채점 완료. 이미지 데이터를 삭제할까요? (y/n): ")
     if confirm.lower() == "y":
-        cleanup_directories([RAW_IMAGE_DIR, OBJ_IMAGE_DIR, SUBJ_IMAGE_DIR])
-        print("이미지 초기화 완료.")
-
+        cleanup_directories([
+            RAW_IMAGE_DIR, OBJ_IMAGE_DIR, SUBJ_IMAGE_DIR, SUB_CROP
+        ])
+    cleanup_yolo_exp()  # ← exp, exp1, exp2 등 삭제
+    print("🧹 이미지 및 YOLO 결과 초기화 완료.")
+    
 if __name__ == "__main__":
     main()

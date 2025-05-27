@@ -20,7 +20,7 @@ MC_WEIGHT =  "weithgt/mc.pt"
 
 def main():
     # 1. 시험지 촬영
-    image_dir = capture_exam_images()
+    image_dir = capture_exam_images(RAW_IMAGE_DIR)
 
     # 2. ROI 추출 및 분리
     obj_dir, subj_dir = extract_roi_and_split(

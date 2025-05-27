@@ -75,10 +75,6 @@ def main():
     student_answers = predict_answer_objective_dict(label_dir_obj)
     student_answers.update(extract_texts_from_cropped_answers(SUB_CROP))
 
-    result = extract_texts_from_cropped_answers(label_subj)
-    print("🧾 주관식 추출 결과:", result)
-
-    student_answers.update(result)
     print(student_answers)
     # 7. 채점
     print("\n📝 채점 시작")

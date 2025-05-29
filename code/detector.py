@@ -3,23 +3,18 @@ import os
 import glob
 from pathlib import Path
 
-def run_yolo_detect(weights_path, image_dir, img_size=640, conf=0.25,
+# detect.py 실행하기기
+def yolo_detect(weights, image, img_size=640, conf=0.25,
                     save_crop=False, project="runs/detect", name="exp"):
-    """
-    yolov5/detect.py를 실행하고 최신 라벨 및 crop 디렉토리 경로를 반환
-    Returns:
-        (str, str): 라벨 디렉토리 경로, crop 디렉토리 경로 (없으면 None)
-    """
-    print("🚀 YOLO detect 실행 중...")
-
+    
     # detect.py 경로 명시적으로 지정
-    detect_py_path = str(Path("yolov5") / "detect.py")
-    cwd = Path(__file__).parent  # ags/ 폴더 기준으로 실행
+    detect_path = str(Path("yolov5") / "detect.py")
+    cwd = Path(__file__).parent  # 현재 폴더의 경로 저장장
 
     command = [
-        "python", detect_py_path,
-        "--weights", weights_path,
-        "--source", image_dir,
+        "python", detect_path,
+        "--weights", weights,
+        "--source", image,
         "--img", str(img_size),
         "--conf", str(conf),
         "--save-txt",
@@ -28,52 +23,24 @@ def run_yolo_detect(weights_path, image_dir, img_size=640, conf=0.25,
         "--name", name,
         "--exist-ok"
     ]
-    if save_crop:
+    if save_crop:  #detect 이미지가 따로 crop되어서 필요한 경우
         command.append("--save-crop")
 
-    subprocess.run(command, cwd=cwd)
+    #detect.py를 터미널이 아닌 코드로 실행하기 위한 코드
+    subprocess.run(command, cwd=cwd)    
 
+    #저장되는 경로 위차 지정
     output_dir = cwd / project / name
     label_dir = output_dir / "labels"
     crop_dir = output_dir / "crops" if save_crop else None
 
+    #예외 처리
     if not label_dir.exists():
         raise FileNotFoundError("YOLO detect 결과 라벨 폴더가 없습니다.")
 
-    print(f"✅ detect 완료 → 라벨 경로: {label_dir}")
-    if crop_dir and crop_dir.exists():
-        print(f"📦 crop 경로: {crop_dir}")
+    print("detect 완료")
 
+    #label이 저장되는 위치와 crop이 된 사진 위치 전달
     return str(label_dir), str(crop_dir)
 
 
-def parse_yolo_label(label_path):
-    """
-    YOLO 형식 라벨 파일을 파싱하여 클래스별 중심 좌표 목록을 반환
-
-    Returns:
-        dict: {
-            'option_box': [(x, y), ...],
-            'marked': [(x, y), ...]
-        }
-    """
-    result = {
-        'option_box': [],
-        'marked': []
-    }
-
-    with open(label_path, 'r') as f:
-        for line in f:
-            parts = line.strip().split()
-            if len(parts) < 5:
-                continue  # 잘못된 라인 무시
-            cls_id = int(parts[0])
-            x_center = float(parts[1])
-            y_center = float(parts[2])
-
-            if cls_id == 0:  # 'option_box' 클래스
-                result['option_box'].append((x_center, y_center))
-            elif cls_id == 1:  # 'marked' 클래스
-                result['marked'].append((x_center, y_center))
-
-    return result

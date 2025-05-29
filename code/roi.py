@@ -72,4 +72,4 @@ def extract_roi_and_split(
             print(f"[✅] Saved {save_path}")
             idx += 1
 
-    print(f"\n🎯 총 {idx - 1}개 ROI 저장 완료.")
+    print("\n ROI 저장 완료.")

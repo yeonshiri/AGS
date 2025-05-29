@@ -20,7 +20,6 @@ import shutil
 import json
 import glob
 
-
 def capture_exam_images(save_dir="/home/pi/yolov5/picture"):    # 저장 경로 라즈베리파이에 맞게 수정
     os.makedirs(save_dir, exist_ok=True)
     image_paths = []
@@ -80,7 +79,7 @@ def compare_dictionary(answer_dic, student_answers):
     print(f"틀린 문제 수: {num_incorrect}")
     print(f"맞은 문제 번호: {correct}")
     print(f"틀린 문제 번호: {incorrect}")
-    print(f"📊 최종 점수: {score}점")
+    print(f"최종 점수: {score}점")
 
     if total == len(student_answers):
         student_answers.clear()
@@ -101,36 +100,11 @@ def cleanup_directories(dirs):
         else:
             os.makedirs(d)
             
-def cleanup_yolo_exp(base_path="yolov5/runs/detect"):
-    """
-    YOLO detect 결과 중 이름이 exp로 시작하는 디렉토리들만 삭제
-    """
-    exp_dirs = glob.glob(os.path.join(base_path, "exp*"))
-
-    for path in exp_dirs:
-        if os.path.isdir(path):
-            try:
-                shutil.rmtree(path)
-                print(f"🗑️ exp 디렉토리 삭제: {path}")
-            except Exception as e:
-                print(f"❌ 삭제 실패: {path} → {e}")
-                
-                
+             
 def load_answer_key(json_path):
-    """
-    정답 JSON 파일을 불러옵니다.
-    
-    Args:
-        json_path (str): 정답이 저장된 JSON 파일 경로
-
-    Returns:
-        dict: {"1.jpg": "세포", "2.jpg": "뉴런", ...}
-    """
     if not os.path.exists(json_path):
-        raise FileNotFoundError(f"정답 파일이 존재하지 않습니다: {json_path}")
+        raise FileNotFoundError("파일이 존재하지 않습니다.")
     
     with open(json_path, 'r', encoding='utf-8') as f:
         answer_dict = json.load(f)
-
-    print(f"✅ 정답 {len(answer_dict)}개 로딩 완료")
     return answer_dict

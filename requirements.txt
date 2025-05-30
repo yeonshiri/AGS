@@ -1,0 +1,9 @@
+torch>=1.13.0
+opencv-python
+numpy
+pillow
+PyYAML
+matplotlib
+tqdm
+requests
+paddleocr

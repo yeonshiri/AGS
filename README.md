@@ -80,7 +80,7 @@ labelimg 라는 툴을 사용하여 모든이미지를 수작업으로 라벨링
 
 ## 5. 객관식 답안 인식
 ### 1. 문제 번호 인식
-![객관식 roi 이미지](img/multians/test.png)
+![객관식 roi 이미지](readme_image/test.png)
 yolo를 활용하여 2개의 class option_box와 marked_box로 구분하여 객관식 선택지와 선택된 답안을 학습시켰습니다.
 ![번호 인식 과정 이미지](readme_image/objective.png)
 

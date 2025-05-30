@@ -37,18 +37,21 @@ install requirement.txt </pre>
 
 <pre>
 ├── ags
-│   ├── yolov5
 │   ├── main.py
-│   ├── roi.py
-│   ├── detector.py
-│   ├── utils.py
-│   ├── grading
-│   │   ├── objective.py
-│   │   └── subjective.py
-│   ├── weights
-│   │   ├── mc.pt
-│   │   ├── sa.pt
-│   │   └── roi.pt
+│   ├── yolov5
+│   ├── codes
+│   │   ├──roi.py
+│   │   ├──detector.py
+│   │   ├──grading
+│   │   │   ├──objective.py
+│   │   │   └──subjective.py
+│   ├──data
+│   │   ├── weights
+│   │   │   ├── mc.pt
+│   │   │   ├── sa.pt
+│   │   │   └── roi.pt
+│   │   ├── answer
+│   │   │   └── answer_key.json
 </pre> 
 
 ### 환경

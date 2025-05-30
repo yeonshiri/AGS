@@ -5,11 +5,11 @@ from pathlib import Path
 
 # detect.py 실행하기기
 def yolo_detect(weights, image, img_size=640, conf=0.25,
-                    save_crop=False, project="runs/detect", name="exp"):
+                    save_crop=False, project="data/detect", name="exp"):
     
     # detect.py 경로 명시적으로 지정
-    detect_path = str(Path("yolov5") / "detect.py")
-    cwd = Path(__file__).parent  # 현재 폴더의 경로 저장장
+    cwd = Path(__file__).resolve().parent.parent   # AGS/  
+    detect_path = cwd / "yolov5" / "detect.py"
 
     command = [
         "python", detect_path,
@@ -30,7 +30,7 @@ def yolo_detect(weights, image, img_size=640, conf=0.25,
     subprocess.run(command, cwd=cwd)    
 
     #저장되는 경로 위차 지정
-    output_dir = cwd / project / name
+    output_dir =  Path(project) / name
     label_dir = output_dir / "labels"
     crop_dir = output_dir / "crops" if save_crop else None
 

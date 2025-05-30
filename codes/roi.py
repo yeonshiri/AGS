@@ -14,7 +14,7 @@ def extract_roi_and_split(
     img_size=960,
     conf_thres=0.4
 ):
-    detect_output_dir = "yolov5/runs/detect/roi_detect"
+    detect_output_dir = "data/detect/roi_detect"
     if os.path.exists(detect_output_dir):
         shutil.rmtree(detect_output_dir)
     # YOLOv5 detect.py 실행
@@ -27,14 +27,14 @@ def extract_roi_and_split(
         "--conf", str(conf_thres),
         "--save-txt",
         "--save-conf",
-        "--project", "yolov5/runs/detect",
+        "--project", "data/detect",
         "--name", "roi_detect",
         "--exist-ok"
     ])
 
     # 경로 설정
-    label_dir = "yolov5/runs/detect/roi_detect/labels"
-    image_dir = "yolov5/runs/detect/roi_detect"
+    label_dir = "data/detect/roi_detect/labels"
+    image_dir = "data/detect/roi_detect"
 
     os.makedirs(output_mc_dir, exist_ok=True)
     os.makedirs(output_sa_dir, exist_ok=True)

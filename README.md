@@ -31,10 +31,29 @@
 
 ## 2. 설치
 git에서 yolov5을 다운을 받은 후 다음과 같은 directory를 만들면 실행이 가능합니다.
-<pre>git clone https://github.com/ultralytics/yolov5.git
-cd yolov5  
-install requirement.txt </pre>   
+<pre>
+#git에서 프로젝트 설치 
+git clone https://github.com/ultralytics/yolov5.git
+pip install -r requirements.txt
 
+#paddleOCR 추가 설치 
+pip install paddlepaddle -i https://pypi.tuna.tsinghua.edu.cn/simple
+
+#yolov5 설치 
+git clone https://github.com/ultralytics/yolov5.git
+cd yolov5  
+pip install -r requirements.txt 
+</pre>   
+
+windows에서 실행시 yolov5/models/experimental.py 다음과 같은 문구 수정
+<pre>
+#코드 추가
+import pathlib
+pathlib.PosixPath = pathlib.WindowsPath
+
+#코드 수정 (encoding = 'latin1' 추가)
+ckpt = torch.load(attempt_download(w), map_location="cpu", encoding = 'latin1') 
+</pre>  
 <pre>
 ├── ags
 │   ├── main.py

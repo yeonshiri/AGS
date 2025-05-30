@@ -96,7 +96,7 @@ yolo를 활용하여 답안 표시 형식의 answer_box를 학습 후 시험지�
 
 ### 2. OCR을 이용한 답안 인식
 ![단답형 ocr 이미지](readme_image/ocr_result.png)
-PaddleOCR lite를 이용하여 저장된 답안을 인식하는 과정을 거치고 dictionaray 형태로 저장합니다. 
+PaddleOCR lite를 이용하여 저장된 답안을 인식하는 과정을 거치고 dictionary 형태로 저장합니다. 
 
 ## 7. 답안과 정답 비교 채점
 ![채점 결과 이미지](readme_image/grading.png)

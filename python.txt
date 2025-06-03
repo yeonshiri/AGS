@@ -1,0 +1,31 @@
+sudo apt update
+sudo apt install -y \
+  libffi-dev libbz2-dev libreadline-dev libsqlite3-dev \
+  libssl-dev zlib1g-dev libncursesw5-dev \
+  libgdbm-dev libnss3-dev liblzma-dev tk-dev \
+  build-essential wget
+
+
+
+cd /usr/src
+sudo wget https://www.python.org/ftp/python/3.9.21/Python-3.9.21.tgz
+sudo tar xzf Python-3.9.21.tgz
+cd Python-3.9.21
+
+
+
+sudo ./configure --enable-optimizations
+sudo make -j4      # -j4는 CPU 코어 수에 따라 조정 (Raspberry Pi 4면 그대로 OK)
+sudo make altinstall
+
+
+python3.9 --version
+# 출력 예시: Python 3.9.21
+
+
+python3.9 -c "import ctypes; print('ctypes OK')"
+
+
+python3.9 -m pip install --upgrade pip
+python3.9 -m pip install paddleocr
+python3.9 main.py

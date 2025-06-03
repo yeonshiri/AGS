@@ -34,6 +34,7 @@ git에서 yolov5을 다운을 받은 후 다음과 같은 directory를 만들면
 <pre>
 #git에서 프로젝트 설치 
 git clone https://github.com/yeonshiri/AGS.git
+cd AGS
 pip install -r requirements.txt
 
 #paddleOCR 추가 설치 

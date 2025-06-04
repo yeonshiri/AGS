@@ -38,7 +38,7 @@ cd AGS
 pip install -r requirements.txt
 
 #paddleOCR 추가 설치 
-pip install paddlepaddle -i https://pypi.tuna.tsinghua.edu.cn/simple
+python3.9 -m pip install "paddlepaddle==2.5.2" -f https://www.paddlepaddle.org.cn/whl/linux/arm/openblas.html
 
 #yolov5 설치 
 git clone https://github.com/ultralytics/yolov5.git

@@ -4,10 +4,11 @@ from pathlib import Path
 from codes.roi import extract_roi_and_split
 from codes.detector import yolo_detect
 from codes.utils import capture_exam_images, compare_dictionary, load_answer_key, cleanup_directories
+from codes.sa_roi import crop_selected_answers  
+from codes.predict import predict_all
+from codes.capture import capture_exam_images
 from codes.grading.subjective import sa_answer_num, sa_answer_eng
 from codes.grading.objective import mc_answer
-from codes.sa_roi import crop_selected_answers  # post-processing 로직 import
-from codes.predict import predict_all
 
 # 설정 경로
 RAW_IMAGE_DIR = "data/image/raw_images"
@@ -30,14 +31,13 @@ def main():
     OBJ_IMAGE_DIR,
     "data/detect"
     ])
+    
     student_answers = {}
+    
     # 1. 시험지 촬영
-    image_dir = [
-        os.path.join(RAW_IMAGE_DIR, f)
-        for f in sorted(os.listdir(RAW_IMAGE_DIR))
-        if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))
-    ]
-
+    print("camera start")
+    capture_exam_images(page_count = 3)
+    
     # 2. ROI 추출 및 분리
     extract_roi_and_split(
         input_dir=RAW_IMAGE_DIR,       

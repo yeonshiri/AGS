@@ -1,4 +1,5 @@
-torch>=1.13.0
+torch==2.7.0
+torchvision==0.22.0
 opencv-python
 numpy
 pillow
@@ -6,4 +7,4 @@ PyYAML
 matplotlib
 tqdm
 requests
-paddleocr
+paddleocr>=2.6

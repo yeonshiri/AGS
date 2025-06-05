@@ -3,7 +3,12 @@ import os
 import re
 from PIL import Image
 
-ocr = PaddleOCR(use_angle_cls=True, lang='korean')
+ocr = PaddleOCR(
+    use_angle_cls=False,
+    lang='en',
+    det_model_dir='/home/pi/paddleocr_lite/inference/en_PP-OCRv3_det_infer',
+    rec_model_dir='/home/pi/paddleocr_lite/inference/en_PP-OCRv3_rec_infer'
+)
 
 def sa_answer(crop_dir):
     
@@ -30,7 +35,7 @@ def sa_answer(crop_dir):
             continue
         
         #답에 ocr 적용해서 읽기
-        result = ocr.ocr(img_path, cls=True)
+        result = ocr.ocr(img_path)
         
         #ocr 결과에서 좌표를 제외하고 읽은 문자만 불러오기
         extracted = ""

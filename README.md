@@ -94,9 +94,9 @@ ckpt = torch.load(attempt_download(w), map_location="cpu", encoding = 'latin1')
 ### 모델 학습
 ![라벨링](readme_image/labeling.png)
 labelImg 툴을 사용하여 모든 이미지에 직접 라벨링을 진행하였다.
-●시험지 full shot: 객관식과 단답형 문제 구역을 다른 class로 구분하여 라벨링
-●객관식: 선택지(option_box)와 답안(marked)을 라벨링
-●단답형: 답안 box(box)와 답안(answer)을 라벨링
+- 시험지 full shot: 객관식과 단답형 문제 구역을 다른 class로 구분하여 라벨링
+- 객관식: 선택지(option_box)와 답안(marked)을 라벨링
+- 단답형: 답안 box(box)와 답안(answer)을 라벨링
 
 
 ## 4. ROI 추출
@@ -105,7 +105,7 @@ labelImg 툴을 사용하여 모든 이미지에 직접 라벨링을 진행하�
 
 ![문제 번호 정렬](readme_image/quesnum.jpg)
 일반적인 시험지는 왼쪽 위에서부터 아래로 번호가 증가한 후, 오른쪽으로 넘어가는 형식을 채택한다. 해당 방식을 착안하여 다음과 같은 알고리즘을 제작했다.
-●번호 매칭 알고리즘: 시험지 full shot에서 각 bbox의 중심 좌표를 이용한다. label.txt로 얻어진 좌푯값을 추출하여 각 bbox의 x, y좌표를 얻어낸 후, 각 bbox의 x좌표를 오름차순 → y좌표를 오름차순으로 정렬하여 번호를 부여하면 모든 ROI에 문제 번호를 매칭시킬 수 있다. 시험지가 여러 장이어도 적용 가능하다.
+- 번호 매칭 알고리즘: 시험지 full shot에서 각 bbox의 중심 좌표를 이용한다. label.txt로 얻어진 좌푯값을 추출하여 각 bbox의 x, y좌표를 얻어낸 후, 각 bbox의 x좌표를 오름차순 → y좌표를 오름차순으로 정렬하여 번호를 부여하면 모든 ROI에 문제 번호를 매칭시킬 수 있다. 시험지가 여러 장이어도 적용 가능하다.
 
 ![문제 인식 과정 이미지](readme_image/roi.png)
 [시험지에서 ROI가 추출되는 과정]

@@ -19,6 +19,7 @@ import os
 import shutil
 import json
 import glob
+import re
 
 def capture_exam_images(save_dir="/home/pi/yolov5/picture"):    # 저장 경로 라즈베리파이에 맞게 수정
     os.makedirs(save_dir, exist_ok=True)
@@ -54,38 +55,37 @@ def capture_exam_images(save_dir="/home/pi/yolov5/picture"):    # 저장 경로 
     return image_paths
 
 
-def compare_dictionary(answer_dic, student_answers):
-    # 채점 결과
-    correct = []
-    incorrect = []
+def extract_number(key):
+    match = re.search(r'\d+', str(key))
+    return int(match.group()) if match else float('inf')
 
-    for q_num, correct_ans in answer_dic.items():
-        student_ans = student_answers.get(q_num)
-        if student_ans == correct_ans:
-            correct.append(q_num)
-        else:
-            incorrect.append(q_num)
+def compare_dictionary(answer_dic, student_answers):
+    result_list = []
+
+    for q_num in sorted(answer_dic.keys(), key=extract_number):  # 숫자만 추출해 정렬
+        correct_ans = answer_dic[q_num]
+        student_ans = student_answers.get(q_num, "")
+        is_correct = (student_ans == correct_ans)
+        result_list.append((q_num, correct_ans, student_ans, is_correct))
 
     total = len(answer_dic)
-    num_correct = len(correct)
-    num_incorrect = len(incorrect)
-
-    # 점수 계산 (정답률 기반, 정수로 반올림)
+    num_correct = sum(1 for _, _, _, is_correct in result_list if is_correct)
+    num_incorrect = total - num_correct
     score = round((num_correct / total) * 100) if total > 0 else 0
 
-    # 결과 출력
-    print(f"총 문제 수: {total}")
+    print("\n[채점 결과]")
+    for q_num, correct_ans, student_ans, is_correct in result_list:
+        mark = "O" if is_correct else "X"
+        print(f"{str(q_num):>6} 문제: 정답={correct_ans:<5} 제출={student_ans:<5}  {mark}")
+
+    print(f"\n총 문제 수: {total}")
     print(f"맞은 문제 수: {num_correct}")
     print(f"틀린 문제 수: {num_incorrect}")
-    print(f"맞은 문제 번호: {correct}")
-    print(f"틀린 문제 번호: {incorrect}")
     print(f"최종 점수: {score}점")
 
     if total == len(student_answers):
         student_answers.clear()
-        print("(디버깅용) student_answers 초기화됨:", student_answers)
-
-    return score  # 필요하면 외부에서 점수 활용할 수 있도록 반환
+        print("\n(디버깅용) student_answers 초기화됨:", student_answers)
 
 
 def cleanup_directories(dirs):
@@ -108,3 +108,63 @@ def load_answer_key(json_path):
     with open(json_path, 'r', encoding='utf-8') as f:
         answer_dict = json.load(f)
     return answer_dict
+
+
+
+
+
+import tkinter as tk
+from tkinter import ttk
+
+
+def compare_and_show_gui(answer_dic, student_answers):
+    result_list = []
+
+    for q_num in sorted(answer_dic.keys(), key=extract_number):
+        correct_ans = answer_dic[q_num]
+        student_ans = student_answers.get(q_num, "")
+        is_correct = (student_ans == correct_ans)
+        result_list.append((q_num, correct_ans, student_ans, is_correct))
+
+    total = len(answer_dic)
+    num_correct = sum(1 for _, _, _, correct in result_list if correct)
+    num_incorrect = total - num_correct
+    score = round((num_correct / total) * 100) if total > 0 else 0
+
+    # Tkinter GUI
+    root = tk.Tk()
+    root.title("📊 채점 결과 보기")
+    root.geometry("600x800")
+    root.lift()
+    root.attributes('-topmost', True)
+    root.after(1000, lambda: root.attributes('-topmost', False))  # 선택
+
+    root.bind("<Escape>", lambda e: root.destroy())
+
+    # 요약 정보
+    summary = tk.Label(root, text=f"총 {total}문제 중 {num_correct}개 정답!   점수: {score}점",
+                       font=("Arial", 14), pady=10)
+    summary.pack()
+
+    # 테이블 생성
+    tree = ttk.Treeview(root, columns=("문제", "정답", "제출", "채점"), show="headings", height=25)
+    tree.column("문제", width=80, anchor="center")
+    tree.column("정답", width=100, anchor="center")
+    tree.column("제출", width=100, anchor="center")
+    tree.column("채점", width=80, anchor="center")
+
+    tree.heading("문제", text="문제 번호")
+    tree.heading("정답", text="정답")
+    tree.heading("제출", text="제출")
+    tree.heading("채점", text="결과")
+
+    for q_num, correct, submitted, is_correct in result_list:
+        mark = "O" if is_correct else "X"
+        tree.insert("", "end", values=(q_num, correct, submitted, mark))
+
+    tree.pack(padx=10, pady=10)
+
+    # 닫기 버튼
+    tk.Button(root, text="닫기", command=root.destroy).pack(pady=10)
+
+    root.mainloop()

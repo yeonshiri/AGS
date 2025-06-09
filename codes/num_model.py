@@ -16,16 +16,17 @@ class CRNN(nn.Module):
             nn.Conv2d(256, 512, 3, 1, 1), nn.BatchNorm2d(512), nn.ReLU(),
             nn.Conv2d(512, 512, 3, 1, 1), nn.BatchNorm2d(512), nn.ReLU(), nn.MaxPool2d((2,1), (2,1)),
             nn.Conv2d(512, 512, 2, 1, 0), nn.ReLU(),
-            nn.AdaptiveAvgPool2d((1, None))
+            nn.AdaptiveAvgPool2d((1, None))  # height → 1
         )
 
-        self.rnn1 = nn.LSTM(512, nh, bidirectional=True)
+        self.rnn1 = nn.LSTM(512, nh, bidirectional=True)  
         self.rnn2 = nn.LSTM(nh * 2, nh, bidirectional=True)
         self.embedding = nn.Linear(nh * 2, nclass)
 
     def forward(self, x):
-        conv = self.cnn(x)  # (B, C, 1, W)
+        conv = self.cnn(x)           # (B, C, H, W)
         b, c, h, w = conv.size()
+        # assert h == 3               ❌ 제거하거나 아래처럼 수정
         assert h == 1, f"Expected height=1 but got {h}"
 
         conv = conv.squeeze(2)       # (B, C, W)
@@ -37,7 +38,7 @@ class CRNN(nn.Module):
         return output
 
 class HandwrittenDataset(Dataset):
-    def __init__(self, image_dir, label_path, transform=None, img_size=(24, 100)):
+    def __init__(self, image_dir, label_path, transform=None, img_size=(64, 64)):
         self.image_dir = image_dir
         self.samples = []
         with open(label_path, "r") as f:
@@ -61,6 +62,6 @@ class HandwrittenDataset(Dataset):
         img = cv2.resize(img, self.img_size)
         img = img.astype(np.float32) / 255.0
         img = np.expand_dims(img, axis=0)
-        img_tensor = torch.tensor(img)
+        img_tensor = torch.from_numpy(img).clone() 
         label_encoded = torch.tensor(self.encode_label(label), dtype=torch.long)
         return img_tensor, label_encoded

@@ -56,6 +56,7 @@ def sa_answer_eng(crop_dir):
             
         #dictionary에 저장하기
         predictions[question_key] = extracted.strip()
+        predictions= {k: v.lower() for k, v in predictions.items()}
 
     return predictions
 

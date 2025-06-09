@@ -31,7 +31,7 @@ def ctc_decode(pred):
     return results
 
 # 전처리 함수
-def preprocess_image_like_dataset(path, img_size=(24, 100)):
+def preprocess_image_like_dataset(path, img_size=(64, 64)):
     img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
     if img is None:
         return None
@@ -42,8 +42,8 @@ def preprocess_image_like_dataset(path, img_size=(24, 100)):
     return img_tensor
 
 # 예측 함수
-def predict_all(image_dir="images", weight_path="asd.pth"):
-    model = CRNN(imgH=32, nc=1, nclass=nclass, nh=nh).to(device)
+def predict_all(image_dir="images", weight_path="num_v3.pth"):
+    model = CRNN(imgH=64, nc=1, nclass=nclass, nh=nh).to(device)
     state_dict = torch.load(weight_path, map_location=device)
     model.load_state_dict(state_dict)
     model.eval()

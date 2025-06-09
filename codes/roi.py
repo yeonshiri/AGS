@@ -20,17 +20,18 @@ def extract_roi_and_split(
     # YOLOv5 detect.py 실행
     
     subprocess.run([
-        "python", "yolov5/detect.py",
-        "--weights", weights_path,
-        "--source", input_dir,
-        "--img", str(img_size),
-        "--conf", str(conf_thres),
-        "--save-txt",
-        "--save-conf",
-        "--project", "data/detect",
-        "--name", "roi_detect",
-        "--exist-ok"
+    "python", "yolov5/detect.py",
+    "--weights", weights_path,
+    "--source", input_dir,
+    "--img", str(img_size),
+    "--conf", str(conf_thres),
+    "--save-txt",
+    # "--save-conf",  # ❌ 이 줄 삭제!
+    "--project", "data/detect",
+    "--name", "roi_detect",
+    "--exist-ok"
     ])
+
 
     # 경로 설정
     label_dir = "data/detect/roi_detect/labels"
@@ -42,7 +43,7 @@ def extract_roi_and_split(
     idx = 1
     for label_file in sorted(glob.glob(f"{label_dir}/*.txt")):
         base = os.path.splitext(os.path.basename(label_file))[0]
-        img_path = os.path.join(image_dir, f"{base}.jpg")
+        img_path = os.path.join(input_dir, f"{base}.jpg")
         img = cv2.imread(img_path)
         h, w = img.shape[:2]
 

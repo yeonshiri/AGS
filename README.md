@@ -143,7 +143,6 @@ CRNN+CTC의 기본 정의는 다음과 같다
   
 
 ![숫자 단답형 ocr 이미지](readme_image/crnn.png)
-이와 같은 방법으로 학습을 진행하였다. 
 
 ### 6-1-2. 영어 답안 인식
 ![영어 단답형 ocr 이미지](readme_image/eng.png)

@@ -127,7 +127,6 @@ labelImg 툴을 사용하여 모든 이미지에 직접 라벨링을 진행하�
 학습된 yolov5n 모델을 이용하여 답안 box(box)와 답안(answer)을 단답형 ROI에서 detect한 후, label 좌푯값을 이용하여 답안(answer)만 별도의 ROI로 저장한다.
 ![답안 인식 과정 이미지](readme_image/subjective.png)
 [단답형 ROI에서 answer box가 detect되는 과정]
---이거 answer가 detect 되는 사진으로 변경
 
 ### 6-1-1. 숫자 답안 인식
 ![숫자 단답형 ocr 이미지](readme_image/ocr_result.png)
@@ -142,9 +141,9 @@ CRNN+CTC의 기본 정의는 다음과 같다
   해주는 손실 함수다. 중복 문자와 공백을 제거 후 문자열을   
   예측한다.
   
-다음은 이와 같은 방법으로 학습을 진행하였다. 
 
 ![숫자 단답형 ocr 이미지](readme_image/crnn.png)
+이와 같은 방법으로 학습을 진행하였다. 
 
 ### 6-1-2. 영어 답안 인식
 ![영어 단답형 ocr 이미지](readme_image/eng.png)

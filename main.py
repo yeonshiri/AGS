@@ -4,8 +4,8 @@ from pathlib import Path
 from codes.roi import extract_roi_and_split
 from codes.detector import yolo_detect
 from codes.utils import capture_exam_images, compare_dictionary, load_answer_key, cleanup_directories, compare_and_show_gui
-from codes.grading.subjective import  sa_answer_eng
-from codes.grading.objective import mc_answer
+from codes.subjective import  sa_answer_eng
+from codes.objective import mc_answer
 from codes.sa_roi import crop_selected_answers  # post-processing 로직 import
 from codes.predict import predict_all
 

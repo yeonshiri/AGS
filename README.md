@@ -139,7 +139,7 @@ CRNN+CTC의 기본 정의는 다음과 같다
 - CTC: 위치 정보 없이 정답 시퀀스(순서)를 학습할 수 있게 해주는 손실 함수다. 중복 문자와 공백을 제거 후 문자열을 예측한다.
   
 
-![숫자 단답형 ocr 이미지](readme_image/crnn.png)
+![숫자 단답형 ocr 이미지](readme_image/crnn_1.png)
 
 ### 6-1-2. 영어 답안 인식
 ![영어 단답형 ocr 이미지](readme_image/eng.png)

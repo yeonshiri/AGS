@@ -123,7 +123,7 @@ labelImg 툴을 사용하여 모든 이미지에 직접 라벨링을 진행하�
 
 ## 6. 단답형 자동 채점
 ### 6-1. 답안 box와 답안 detect
-![단답형 roi 이미지](readme_image/sa.png)
+![단답형 roi 이미지](readme_image/sa_1.png)
 학습된 yolov5n 모델을 이용하여 답안 box(box)와 답안(answer)을 단답형 ROI에서 detect한 후, label 좌푯값을 이용하여 답안(answer)만 별도의 ROI로 저장한다.
 ![답안 인식 과정 이미지](readme_image/subjective.png)
 [단답형 ROI에서 answer box가 detect되는 과정]

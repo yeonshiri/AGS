@@ -31,7 +31,7 @@
     3. 각 답안을 딕셔너리 저장
 4.  딕셔너리 채점 후 결과 정리
 
-![flow 사진](readme_image/flow.jpg)
+![flow 사진](readme_image/flow.png)
 
 ## 2. 실행을 위한 설치 패키지
 git에서 yolov5를 다운로드 받은 후 다음과 같은 directory를 만들면 실행이 가능하다.

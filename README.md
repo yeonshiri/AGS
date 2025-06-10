@@ -31,7 +31,7 @@
     3. 각 답안을 딕셔너리 저장
 4.  딕셔너리 채점 후 결과 정리
 
-![flow 사진](readme_image/flow.jpg)
+![flow 사진](readme_image/flow.png)
 
 ## 2. 실행을 위한 설치 패키지
 git에서 yolov5를 다운로드 받은 후 다음과 같은 directory를 만들면 실행이 가능하다.
@@ -133,8 +133,21 @@ labelImg 툴을 사용하여 모든 이미지에 직접 라벨링을 진행하�
 ![숫자 단답형 ocr 이미지](readme_image/ocr_result.png)
 custom 학습된 CRNN 구조에 CTC 알고리즘을 이용하여 숫자 답안을 인식하고 dictionary에 저장한다.
 
+CRNN+CTC의 기본 정의는 다음과 같다
+- CNN: 입력 이미지에서 공간적 특징을 추출한다.
+- RNN: 정보를 시퀀스(순서) 처리하여 글자 간 연결 정보를   
+  반영한다. 
+- Linear: 각 시점의 특징을 숫자 클래스별 확률로 변환한다
+- CTC:  위치 정보 없이 정답 시퀀스(순서)를 학습할 수 있게      
+  해주는 손실 함수다. 중복 문자와 공백을 제거 후 문자열을   
+  예측한다.
+  
+다음은 이와 같은 방법으로 학습을 진행하였다. 
+
+![숫자 단답형 ocr 이미지](readme_image/crnn.png)
+
 ### 6-1-2. 영어 답안 인식
-![영어 단답형 ocr 이미지]
+![영어 단답형 ocr 이미지](readme_image/eng.png)
 Paddle OCR lite 모델을 이용하여 영어 답안을 인식하고 dictionary에 저장한다.
 
 

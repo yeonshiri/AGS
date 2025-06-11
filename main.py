@@ -1,13 +1,13 @@
 import os
 from pathlib import Path
+from codes.capture import capture_exam_images
 from codes.roi import extract_roi_and_split
 from codes.detector import yolo_detect
 from codes.utils import  load_answer_key, cleanup_directories, compare_and_show_gui
-from codes.subjective import  sa_answer_eng
-from codes.objective import mc_answer
-from codes.sa_roi import crop_selected_answers  # post-processing 로직 import
-from codes.predict import predict_all
-from codes.capture import capture_exam_images
+from codes.sa_roi import crop_selected_answers  
+from codes.predict_obj import mc_answer
+from codes.predict_num import sa_answer_num
+from codes.predict_eng import  sa_answer_eng
 
 # 설정 경로
 RAW_IMAGE_DIR = "data/image/raw_images"
@@ -97,7 +97,7 @@ def main():
            
     if num_crop_dir.exists() and any(f.suffix.lower() in ['.jpg', '.jpeg', '.png'] for f in num_crop_dir.iterdir()):
         print("\n🔢 숫자 인식 시작")
-        student_answers.update(predict_all(image_dir=SUB_CROP_NUM,weight_path=NUM_WEIGHT))
+        student_answers.update(sa_answer_num(image_dir=SUB_CROP_NUM,weight_path=NUM_WEIGHT))
     else:
         print("⚠️ 숫자 답안 없음")
         

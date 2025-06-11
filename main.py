@@ -1,13 +1,13 @@
 import os
 from pathlib import Path
-
 from codes.roi import extract_roi_and_split
 from codes.detector import yolo_detect
-from codes.utils import capture_exam_images, compare_dictionary, load_answer_key, cleanup_directories, compare_and_show_gui
+from codes.utils import  load_answer_key, cleanup_directories, compare_and_show_gui
 from codes.subjective import  sa_answer_eng
 from codes.objective import mc_answer
 from codes.sa_roi import crop_selected_answers  # post-processing 로직 import
 from codes.predict import predict_all
+from codes.capture import capture_exam_images
 
 # 설정 경로
 RAW_IMAGE_DIR = "data/image/raw_images"
@@ -26,17 +26,12 @@ image_exts = ('.jpg', '.jpeg', '.png', '.bmp')
 def main():
     #0 data 파일 초기화 후 진행
     cleanup_directories([
-    SUBJ_IMAGE_DIR,
-    OBJ_IMAGE_DIR,
+    "data/image",
     "data/detect"
     ])
     student_answers = {}
     # 1. 시험지 촬영
-    image_dir = [
-        os.path.join(RAW_IMAGE_DIR, f)
-        for f in sorted(os.listdir(RAW_IMAGE_DIR))
-        if f.lower().endswith((".jpg", ".jpeg", ".png", ".bmp"))
-    ]
+    capture_exam_images(page_count=4)
 
     # 2. ROI 추출 및 분리
     extract_roi_and_split(
@@ -45,12 +40,9 @@ def main():
         output_mc_dir=OBJ_IMAGE_DIR,
         output_sa_dir=SUBJ_IMAGE_DIR
     )
+    
 
-
-    # 3. 정답 불러오기
-    answer_key = load_answer_key(ANSWER_KEY_PATH)
-
-    # 4. 객관식 문제 영역 YOLO 탐지
+    # 3. 객관식 문제 영역 YOLO 탐지
     if(any(file.lower().endswith(image_exts) for file in os.listdir(OBJ_IMAGE_DIR))):
         print("\n 객관식 YOLO detect 시작")
         i=1
@@ -66,7 +58,7 @@ def main():
         print("객관식 이미지 없음")
         mc_label = []  # 빈 결과라도 정의해두는 게 안전함
         
-    # 5. 주관식 문제 영역 YOLO 탐지, crop 저장
+    # 4. 주관식 문제 영역 YOLO 탐지, crop 저장
     if any(file.lower().endswith(image_exts) for file in os.listdir(SUBJ_IMAGE_DIR)):
         print("\n 주관식 YOLO detect 시작")
 
@@ -91,7 +83,7 @@ def main():
         print("단답형 이미지 없음")
         sa_label = []
 
-    # 6. 답안 예측
+    # 5. 답안 예측
     print("\n 답안 정리 중")
 
     try:
@@ -117,7 +109,10 @@ def main():
             print("❌ 영어 인식 오류:", e)
     else:
         print("⚠️ 영어 답안 없음")
-            
+        
+    # 7. 정답 불러오기           
+    answer_key = load_answer_key(ANSWER_KEY_PATH)
+    # 8. 채점점
     compare_and_show_gui(answer_key, student_answers)
 
     

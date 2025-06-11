@@ -58,7 +58,7 @@ def box_sort(boxes, row_threshold=0.05):
     current_row = [boxes[0]]
 
     for box in boxes[1:]:
-        #y축으로 거리를 계산해서 threshold보다 낮으면 같은 열로 인식식
+        #y축으로 거리를 계산해서 threshold보다 낮으면 같은 열로 인식
         if abs(box[1] - current_row[-1][1]) < row_threshold:
             #box 가로 열에 추가하기
             current_row.append(box)
@@ -69,7 +69,7 @@ def box_sort(boxes, row_threshold=0.05):
     rows.append(current_row)
 
     sorted_boxes = []
-    #같은 열에서 x축의 값에 따라 번호 순서대로 정렬렬
+    #같은 열에서 x축의 값에 따라 번호 순서대로 정렬
     for row in rows:
         sorted_boxes.extend(sorted(row, key=lambda b: b[0]))
 

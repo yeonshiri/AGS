@@ -12,7 +12,7 @@ charset = "0123456789"
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 하이퍼파라미터 정의
-nclass = 10 + 1  # 숫자 0~9 + CTC blank
+nclass = 10 + 1  # 숫자 0~9 + blank
 nh = 256
 
 # 디코딩 함수
@@ -42,7 +42,7 @@ def preprocess_image_like_dataset(path, img_size=(64, 64)):
     return img_tensor
 
 # 예측 함수
-def predict_all(image_dir="images", weight_path="num_v3.pth"):
+def sa_answer_num(image_dir="images", weight_path="num_v3.pth"):
     model = CRNN(imgH=64, nc=1, nclass=nclass, nh=nh).to(device)
     state_dict = torch.load(weight_path, map_location=device)
     model.load_state_dict(state_dict)
@@ -63,7 +63,7 @@ def predict_all(image_dir="images", weight_path="num_v3.pth"):
             key = fname
 
         if input_tensor is None:
-            predictions[key] = "❌ 이미지 로드 실패"
+            predictions[key] = "이미지 로드 실패"
             continue
 
         input_tensor = input_tensor.to(device)

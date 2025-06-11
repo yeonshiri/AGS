@@ -39,7 +39,7 @@ def extract_roi_and_split(
 
     os.makedirs(output_mc_dir, exist_ok=True)
     os.makedirs(output_sa_dir, exist_ok=True)
-
+    #좌표 정렬렬
     idx = 1
     for label_file in sorted(glob.glob(f"{label_dir}/*.txt")):
         base = os.path.splitext(os.path.basename(label_file))[0]

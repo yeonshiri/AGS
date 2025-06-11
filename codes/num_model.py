@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from torch.utils.data import Dataset
 
+#model layer 구조
 class CRNN(nn.Module):
     def __init__(self, imgH, nc, nclass, nh):
         super(CRNN, self).__init__()
@@ -22,11 +23,10 @@ class CRNN(nn.Module):
         self.rnn1 = nn.LSTM(512, nh, bidirectional=True)  
         self.rnn2 = nn.LSTM(nh * 2, nh, bidirectional=True)
         self.embedding = nn.Linear(nh * 2, nclass)
-
+    #이미지 전처리 과정정
     def forward(self, x):
         conv = self.cnn(x)           # (B, C, H, W)
         b, c, h, w = conv.size()
-        # assert h == 3               ❌ 제거하거나 아래처럼 수정
         assert h == 1, f"Expected height=1 but got {h}"
 
         conv = conv.squeeze(2)       # (B, C, W)
@@ -37,6 +37,7 @@ class CRNN(nn.Module):
         output = self.embedding(rnn_out)  # (T, B, nclass)
         return output
 
+#CRNN에 들어가는 class에 정의
 class HandwrittenDataset(Dataset):
     def __init__(self, image_dir, label_path, transform=None, img_size=(64, 64)):
         self.image_dir = image_dir

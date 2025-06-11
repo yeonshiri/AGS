@@ -54,13 +54,13 @@ def crop_selected_answers(original_image_dir, label_dir, output_dir):
             None
         )
         if not image_path:
-            print(f"[❌ 이미지 없음] {base_name}")
+            print(f"[이미지 없음] {base_name}")
             continue
 
-        print(f"[🔍 처리 중] {base_name} → 이미지: {image_path}")
+        print(f"[처리 중] {base_name} → 이미지: {image_path}")
         img = cv2.imread(image_path)
         if img is None:
-            print(f"[❌ 이미지 로딩 실패] {image_path}")
+            print(f"[이미지 로딩 실패] {image_path}")
             continue
 
         h, w = img.shape[:2]
@@ -105,7 +105,7 @@ def crop_selected_answers(original_image_dir, label_dir, output_dir):
                 print(f"[✔️ 저장] {save_path} (class {cls})")
                 saved = True
 
-        # ❗ marked가 없거나 아무 것도 저장되지 않은 경우 → answer_box 중 conf 높은 것 저장
+        # marked가 없거나 아무 것도 저장되지 않은 경우 answer_box 중 conf 높은 것 저장
         if not saved and answer_boxes:
             selected = max(answer_boxes, key=lambda x: x[2])  # conf 가장 높은 것
             box, cls, _ = selected

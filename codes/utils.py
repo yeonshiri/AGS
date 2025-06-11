@@ -21,44 +21,12 @@ import json
 import glob
 import re
 
-def capture_exam_images(save_dir="/home/pi/yolov5/picture"):    # 저장 경로 라즈베리파이에 맞게 수정
-    os.makedirs(save_dir, exist_ok=True)
-    image_paths = []
-    paper_idx = 1
-
-    cap = cv2.VideoCapture(0)
-    print("s: 촬영, q: 중지")
-
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            print("캡처 실패")
-            break
-
-        cv2.imshow("Test Paper Shot", frame)
-        key = cv2.waitKey(1)
-
-        if key == ord('s'):   # 's' 키를 누르면 저장
-            filename = f"exam_{paper_idx}.jpg"
-            save_path = os.path.join(save_dir, filename)
-            cv2.imwrite(save_path, frame)
-            image_paths.append(save_path)
-            paper_idx += 1
-
-        elif key == ord('q'):
-            print("촬영 종료")
-            break
-
-    print(f"시험지 {paper_idx-1}장 저장됨")
-    cap.release()
-    cv2.destroyAllWindows()
-    return image_paths
-
-
+#딕셔너리에서 key 추출출
 def extract_number(key):
     match = re.search(r'\d+', str(key))
     return int(match.group()) if match else float('inf')
 
+#답안 채점 구버전전
 def compare_dictionary(answer_dic, student_answers):
     result_list = []
 
@@ -87,7 +55,7 @@ def compare_dictionary(answer_dic, student_answers):
         student_answers.clear()
         print("\n(디버깅용) student_answers 초기화됨:", student_answers)
 
-
+#시작하기전 기존 이미지,라벨 파일 제거거 
 def cleanup_directories(dirs):
     for d in dirs:
         if os.path.exists(d):
@@ -100,7 +68,7 @@ def cleanup_directories(dirs):
         else:
             os.makedirs(d)
             
-             
+#정답지 불러오기기     
 def load_answer_key(json_path):
     if not os.path.exists(json_path):
         raise FileNotFoundError("파일이 존재하지 않습니다.")
